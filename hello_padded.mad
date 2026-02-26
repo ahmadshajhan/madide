@@ -1,0 +1,402 @@
+           EXTERNAL FUNCTION (KEY, MYTRAN)
+           NORMAL MODE IS INTEGER
+           ENTRY TO CHANGE.
+           LIST.(INPUT)
+           VECTOR VALUES G(1) = $TYPE$, $SUBST$, $APPEND$, $ADDS,
+           $START$, $RANKS, $DISPLAS
+           VECTOR VALUES SNUMB$ = $13 $
+           FIT=0
+CHANGE     PRINT COMMENT $ PLEASE INSTRUCT ME$
+           LISTRD.(MTLIST.(INPUT),0)
+           JOB = POPTOP.(INPUT)
+           THROUGH IDENT, FOR J = 1,1, J .G. 7
+IDENT      WHENEVER G(J) .E. JOB, TRANSFER TO THEMA
+           PRINT COMMENT $CHANGE NOT RECOGNIZED$
+           TRANSFER TO CHANGE
+THEMA      WHENEVER J .E. 5
+           FUNCTION RETURN IRALST.(INPUT)
+           WHENEVER J .E. 7
+           THROUGH DISPLA, FOR I=0,1, I .G. 32
+           WHENEVER LISTMT.(KEY(I)) .E. 0, TRANSFER TO DISPLA
+           S = SEQRDR.(KEY(I))
+READ7      NEXT = SEQLR.(S,F)
+           WHENEVER F .G. 0, TRANSFER TO DISPLA
+           PRINT COMMENT $#$
+           TPRINT.(NEXT,0)
+           PRINT FORMAT SNUMB, I
+           PRINT COMMENT $ $
+DISPLA     TRANSFER TO READ7
+           CONTINUE
+           PRINT COMMENT $ $
+           PRINT COMMENT $MEMORY LIST FOLLOWS$
+MEMLST     PRINT COMMENT $ $
+           THROUGH MEMLST, FOR I=1, 1, I .G. 4
+           TXTPRT.(MYTRAN(I),0)
+           TRANSFER TO CHANGE
+           END OF CONDITIONAL
+           THEME = POPTOP.(INPUT)
+           SUBJCT = KEY(HASH.(THEME, 5))
+           S = SEQRDR.(SUBJCT)
+LOOK       TERM = SEQLR.(S,F)
+           WHENEVER F .G. 0, TRANSFER TO FAIL
+           WHENEVER TOP.(TERM) .E. THEME, TRANSFER TO FOUND
+           TRANSFER TO LOOK
+FOUND      TRANSFER TO DELTA(J)
+           DELTA(1) TPRINT.(TERM,0)
+           TRANSFER TO CHANGE
+FAIL       PRINT COMMENT $LIST NOT FOUND$
+           DELTA(2) TRANSFER TO CHANGE
+           S = SEQRDR.(TERM)
+READ1      CLD = POPTOP.(INPUT)
+           OBJCT = SEQLR.(S,F)
+READ2      WHENEVER F .G. 0, TRANSFER TO FAIL
+           WHENEVER F .NE. 0 TRANSFER TO READ1
+           INSIDE = SEQRDR.(OBJCT)
+           IT = SEQLR.(INSIDE,F)
+           WHENEVER F .G. 0, TRANSFER TO READ1
+           SIT = SEQRDR.(IT)
+ITOLD      SOLD = SEQRDR.(OLD)
+           TOLD = SEQLR.(SOLD, FOLD)
+           DIT = SEQLR.(SIT, FIT)
+           WHENEVER TOLD .E. DIT .AND. FOLD .E. 0, TRANSFER TO ITOLD
+           WHENEVER FOLD .G. 0, TRANSFER TO OKJ
+           TRANSFER TO READ2
+           SUBST.(POPTOP.(INPUT), LSPNTR.(INSIDE))
+OK2        TRANSFER TO CHANGE
+           NEWBOT.(POPTOP.(INPUT), OBJCT)
+OK3        TRANSFER TO CHANGE
+           DELTA(3) TRANSFER TO DELTA(2)
+           WHENEVER NAMTST.(BOT.(TERM)) .E. 0
+           BOTTOM=POPBOT.(TERM)
+           NEWBOT.(POPTOP.(INPUT), TERM)
+           DELTA(4) NEWBOT.(BOTTOM, TERM)
+           OTHERWISE
+           NEWBOT.(POPTOP.(INPUT), TERM)
+           END OF CONDITIONAL
+           TRANSFER TO CHANGE
+           S = SEQRDR.(TERM)
+           DELTA(6) OBJCT = SEQLR.(S,F)
+READ6      WHENEVER F .G. 0, TRANSFER TO FAIL
+           WHENEVER F .NE. 0 TRANSFER TO READ6
+           OBJCT = SEQLL.(S,F)
+           WHENEVER LNKL.(OBJCT) .E. 0
+           SUBST.(POPTOP.(INPUT), LSPNTR.(S))
+           OTHERWISE
+           NEWTOP.(POPTOP.(INPUT), LSPNTR.(S))
+           END OF CONDITIONAL
+           TRANSFER TO CHANGE
+           END OF FUNCTION
+
+           EXTERNAL FUNCTION (LST)
+           NORMAL MODE IS INTEGER
+           ENTRY TO TPRINT.
+           SA = SEQRDR.(LST)
+           LIST.(OUT)
+           NEXT = SEQLR.(SA,FA)
+READ       WHENEVER FA .G. 0, TRANSFER TO DONE
+           WHENEVER FA .E. 0, TRANSFER TO B
+           POINT = NEWBOT.(NEXT, OUT)
+           WHENEVER SA .L. 0, MRKNEG.(POINT)
+           TRANSFER TO READ
+           TXTPRT.(OUT,0)
+B          SEQLL.(SA,FA)
+           NEXT = SEQLR.(SA,FA)
+MORE       WHENEVER TOP.(NEXT) .E. $=$
+           TXTPRT.(NEXT,0)
+           TRANSFER TO MORE
+           END OF CONDITIONAL
+           WHENEVER FA .G. 0, TRANSFER TO DONE
+           PRINT COMMENT $ $
+           SB = SEQRDR.(NEXT)
+           TERM = SEQLR.(SB,FB)
+MEHR       WHENEVER FB .L. 0
+           PRINT ON LINE FORMAT NUMBER, TERM
+           VECTOR VALUES NUMBER = $13 $
+           TRANSFER TO MEHR
+           END OF CONDITIONAL
+           WHENEVER FB .G. 0, TRANSFER TO MORE
+           TXTPRT.(TERM,0)
+           TRANSFER TO MEHR
+DONE       END OF FUNCTION
+
+           EXTERNAL FUNCTION (LST,TAPE)
+           NORMAL MODE IS INTEGER
+           ENTRY TO LPRINT
+           BLANK = $ 5 $
+BEGIN      EXECUTE PLACE.(TAPE,0)
+           LEFTP = 606074606060K
+           RIGHTP = 606034606060K
+           BOTH = 607460603460K
+           EXECUTE NEWTOP.(SEQRDR.(LST), LIST.(STACK))
+           S=POPTOP.(STACK)
+           EXECUTE PLACE.(LEFTP,1)
+NEXT       WORD = SEQLR.(S,FLAG)
+           WHENEVER FLAG .L. 0
+           EXECUTE PLACE.(WORD,1)
+           WHENEVER S .G. 0, PLACE.(BLANK,1)
+           TRANSFER TO NEXT
+           OR WHENEVER FLAG .G. 0
+           EXECUTE PLACE.(RIGHTP,1)
+           WHENEVER LISTMT.(STACK) .E. 0, TRANSFER TO DONE
+           S = POPTOP.(STACK)
+           TRANSFER TO NEXT
+           OTHERWISE
+           WHENEVER LISTMT.(WORD) .E. 0
+           EXECUTE PLACE.(BOTH, 1)
+           TRANSFER TO NEXT
+           OTHERWISE
+           EXECUTE NEWTOP.(S,STACK)
+           S = SEQRDR.(WORD)
+           TRANSFER TO BEGIN
+           END OF CONDITIONAL
+DONE       END OF CONDITIONAL
+           EXECUTE PLACE.(0,-1)
+           EXECUTE IRALST.(STACK)
+           FUNCTION RETURN LST
+           END OF FUNCTION
+
+           EXTERNAL FUNCTION CAND,S)
+           NORMAL MODE IS INTEGER
+           DIMENSION FIRST(5), SECOND(5)
+           ENTRY TO TESTS.
+           STORE = S
+           READER = SEQRDR.(CAND)
+           THROUGH ONE, FOR I = 0,1, I .G. 100
+           FIRST(I) = SEQLR.(READER, FR)
+ONE        WHENEVER READER .G. 0, TRANSFER TO ENDONE
+           SEQLL.(S,F)
+ENDONE     THROUGH TWO, FOR J = 0,1, J .G. 100
+           SECOND(J) = SEQLR.(S,F)
+TWO        WHENEVER S .G. 0, TRANSFER TO ENDTWO
+ENDTWO     WHENEVER I .NE. J, FUNCTION RETURN 0
+           THROUGH LOOK, FOR K=0,1, K .G. J
+LOOK       WHENEVER FIRST(K) .NE. SECOND(K), FUNCTION RETURN 0
+           EQL = SEQLR.(READER,FR)
+           WHENEVER EQL .NE. $=$
+           SEQLL.(READER, FR)
+           FUNCTION RETURN READER
+           OTHERWISE
+           POINT = LNKL.(STORE)
+           THROUGH DELETE FOR K=0,1, K .G. J
+           REMOVE.(LSPNTR.(STORE))
+DELETE     SEQLR.(STORE, F)
+INSRT      NEW = SEQLR.(READER,FR)
+           POINT = NEWTOP.(NEW,POINT)
+           MRKNEG.(POINT)
+           WHENEVER READER .L. 0
+           TRANSFER TO INSRT
+           MRKPOS.(POINT)
+           FUNCTION RETURN READER
+           END OF CONDITIONAL
+           END OF FUNCTION
+
+           EXTERNAL FUNCTION (A,B)
+           NORMAL MODE IS INTEGER
+           ENTRY TO FRBCD.
+NUMBER     WHENEVER LNKL.(A) .E. 0, TRANSFER TO NUMBER
+           B=A
+           FUNCTION RETURN 0
+           K = A / 262144
+           B = BCDIT.(K)
+           FUNCTION RETURN 0
+           END OF FUNCTION
+
+ELIZA      MAD
+           NORMAL MODE IS INTEGER
+           DIMENSION KEY(32), MYTRAN (4)
+           INITAS.(0)
+           PRINT COMMENT $WHICH SCRIPT DO YOU WISH TO PLAY$
+READ       FORMAT SNUMB, SCRIPT
+           LIST.(TEST)
+           LIST.(INPUT)
+           LIST.(OUTPUT)
+           LIST.(JUNK)
+           LIMIT=1
+MLST       LSSCPY.(TREAD.(INPUT, SCRIPT), JUNK)
+           MTLIST.(INPUT)
+           THROUGH MLST, FOR I=1,1, I .G. 4
+           LIST.(MYTRAN(I))
+           MINE=0
+           LIST.(MYLIST)
+KEYLST     THROUGH KEYLST, FOR I=0,1, I .G. 32
+           LIST.(KEY(I))
+           PRINT COMMENT......... READ NEW SCRIPT
+BEGIN      MTLIST.(INPUT)
+           NODLST.(INPUT)
+           LISTRD.(INPUT, SCRIPT)
+           WHENEVER LISTMT.(INPUT) .E. 0
+           TXTPRT.(JUNK,0)
+           MTLIST.(JUNK)
+           TRANSFER TO START
+           END OF CONDITIONAL
+           WHENEVER TOP.(INPUT) .E. $NONE$
+           NEWTOP.(LSSCPY.(INPUT,LIST.(9)), KEY(32))
+           TRANSFER TO BEGIN
+           OR WHENEVER WHENEVER TOP.(INPUT) .E. $MEMORY$
+           POPTOP.(INPUT)
+           MEMORY = POPTOP.(INPUT)
+           THROUGH MEM, FOR I = 1,1, I .G. 4
+           LSSCPY.(POPTOP.(INPUT), MYTRAN(I))
+           TRANSFER TO BEGIN
+           OTHERWISE
+           NEWBOT.(LSSCPY.(INPUT,LIST.(9)), KEY(HASH.(TOP.(INPUT),5)))
+           TRANSFER TO BEGIN
+           END OF CONDITIONAL
+START      TREAD.(MTLIST.(INPUT),0)
+           KEYWRD=0
+           PREDNC=0
+           LIMIT = LIMIT+1
+           WHENEVER LIMIT .E. 5, LIMIT=1
+           WHENEVER LISTMT.(INPUT) .E. 0, TRANSFER TO ENDPLA
+           IT=0
+           WHENEVER TOP.(INPUT) .E. $+$
+           CHANGE.(KEY, MYTRAN)
+           TRANSFER TO START
+           END OF CONDITIONAL
+           WHENEVER TOP.(INPUT) .E. $S$, TRANSFER TO NEWLST
+           S=SEQRDR.(INPUT)
+NOTYET     WHENEVER S .L. 0
+           SEQLR.(S,F)
+           TRANSFER TO NOTYET
+           OTHERWISE
+           WORD = SEQLR.(S,F)
+           WHENEVER WORD .E. $.$ .OR. WORD .E. $,$ .OR. WORD .E. $BUT$
+           WHENEVER IT .E. 0
+           NULSTL.(INPUT, LSPNTR.(S),JUNK)
+           MTLIST.(JUNK)
+           TRANSFER TO NOTYET
+           OTHERWISE
+           NULSTR.(INPUT, LSPNTR.(S),JUNK)
+           MTLIST.(JUNK)
+           TRANSFER TO ENDTXT
+           END OF CONDITIONAL
+           END OF CONDITIONAL
+           WHENEVER F .G. 0, TRANSFER TO ENDTXT
+           I = HASH.(WORD,5)
+           SCANER = SEQRDR.(KEY(I))
+           SF=0
+           THROUGH SEARCH FOR J=0,0, SF .G. 0
+SEARCH     CAND = SEQLR.(SCANER, SF)
+           WHENEVER SF .G. 0, TRANSFER TO NOTYET
+           WHENEVER TOP.(CAND) .E. WORD TRANSFER TO KEYFND
+KEYFND     READER = TESTS.(CAND,S)
+           WHENEVER READER .E. 0, TRANSFER TO NOTYET
+           WHENEVER LSTNAM.(CAND) .NE. 0
+           DL = LSTNAM.(CAND)
+SEQ        WHENEVER S .L. 0
+           SEQLR.(S,F)
+           TRANSFER TO SEQ
+           OTHERWISE
+           NEWTOP.(DL,LSPNTR.(S))
+           END OF CONDITIONAL
+           OTHERWISE
+           END OF CONDITIONAL
+NEXT       SEQLR.(READER, FR)
+           WHENEVER FR .G. 0, TRANSFER TO NOTYET
+PLCKEY     WHENEVER IT .E. 0 .AND. FR .E. 0
+           IT = READER
+           KEYWRD = WORD
+           OR WHENEVER WHENEVER FR .L. 0 .AND. NEXT .G. PREDNC
+           PREDNC = NEXT
+           NEXT = SEQLR.(READER,FR)
+           TRANSFER TO PLCKEY
+           OTHERWISE
+           TRANSFER TO NOTYET
+           END OF CONDITIONAL
+           TRANSFER TO NOTYET
+           PRINT COMMENT          ..... END OF MAJOR LOOP
+ENDTXT     WHENEVER IT .E. 0
+           WHENEVER LIMIT .E. 4 .AND. LISTMT.(MYLIST) .NE. 0
+           OUT = POPTOP.(MYLIST)
+           TXTPRT.(OUT,0)
+           IRALST.(OUT)
+           TRANSFER TO START
+           OTHERWISE
+           ES=BOT.(TOP.(KEY(32)))
+           TRANSFER TO TRY
+           END OF CONDITIONAL
+           OR WHENEVER WHENEVER KEYWRD .E. MEMORY
+           I = HASH.(BOT.(INPUT),2)+1
+           NEWBOT.(REGEL.(MYTRAN(I), INPUT, LIST.(MINE)), MYLIST)
+           SEQLL.(IT,FR)
+           TRANSFER TO MATCH
+           OTHERWISE
+           SEQLL.(IT,FR)
+           PRINT COMMENT..... MATCHING ROUTINE
+MATCH      ES = SEQLR.(IT,FR)
+           WHENEVER TOP.(ES) .E. $=$
+           S = SEQRDR.(ES)
+           SEQLR.(S,F)
+           WORD = SEQLR.(S,F)
+           I = HASH.(WORD,5)
+           SCANER = SEQRDR.(KEY(I))
+SCAN       ITS = SEQLR.(SCANER,F)
+           WHENEVER F .G. 0, TRANSFER TO NOMACH(LIMIT)
+           WHENEVER WORD .E. TOP.(ITS)
+           S=SEQRDR.(ITS)
+SCANI      ES = SEQLR.(S,F)
+           WHENEVER F .NE. 0, TRANSFER TO SCANI
+           IT=S
+           TRANSFER TO TRY
+           OTHERWISE
+           TRANSFER TO SCAN
+           END OF CONDITIONAL
+           END OF CONDITIONAL
+           WHENEVER FR .G. 0, TRANSFER TO NOMACH(LIMIT)
+TRY        WHENEVER YMATCH.(TOP.(ES),INPUT, MTLIST.(TEST)) .E. 0, TRANSFER TO MATCH
+           ESRDR = SEQRDR.(ES)
+           SEQLR.(ESRDR, ESF)
+           POINT = SEQLR.(ESRDR,ESF)
+           POINTR = LSPNTR.(ESRDR)
+           WHENEVER ESF .E. 0
+           NEWBOT.(1,POINTR)
+           TRANS = POINT
+           TRANSFER TO HIT
+           OTHERWISE
+           THROUGH FNDHIT FOR I=0,1, I .G. POINT
+FNDHIT     TRANS = SEQLR.(ESRDR,ESF)
+           WHENEVER ESF .G. 0
+           SEQLR.(ESRDR, ESF)
+           TRANS = SEQLR.(ESRDR, ESF)
+           SUBST.(1,POINTR)
+           TRANSFER TO HIT
+           OTHERWISE
+           SUBST.(POINT+1,POINTR)
+           TRANSFER TO HIT
+           END OF CONDITIONAL
+           END OF CONDITIONAL
+HIT        TXTPRT.(ASSMBL.(TRANS, TEST, MTLIST.(OUTPUT)),0)
+           TRANSFER TO START
+           END OF CONDITIONAL
+           PRINT COMMENT          INSERT NEW KEYWORD LIST
+NEWLST     POPTOP.(INPUT)
+           NEWBOT.(LSSCPY.(INPUT,LIST.(9)), KEY(HASH.(TOP.(INPUT),5)))
+           TRANSFER TO START
+           PRINT COMMENT...... DUMP REVISED SCRIPT
+ENDPLA     PRINT COMMENT $WHAT IS TO BE THE NUMBER OF THE NEW SCRIPT$
+READ       FORMAT SNUMB, SCRIPT
+           LPRINT.(INPUT, SCRIPT)
+           NEWTOP.(MEMORY, MTLIST.(OUTPUT))
+           NEWTOP.($MEMORY$, OUTPUT)
+DUMP       THROUGH DUMP, FOR I=1,1, I .G. 4
+           NEWBOT.(MYTRAN(I), OUTPUT)
+           LPRINT.(OUTPUT, SCRIPT)
+           MTLIST.(OUTPUT)
+POPMOR     THROUGH WRITE, FOR I=0,1, I .G. 32
+           WHENEVER LISTMT.(KEY(I)) .E. 0, TRANSFER TO WRITE
+           LPRINT.(POPTOP.(KEY(I)),SCRIPT)
+           TRANSFER TO POPMOR
+WRITE      CONTINUE
+           LPRINT.(MTLIST.(INPUT), SCRIPT)
+           EXIT.
+           PRINT COMMENT          SCRIPT ERROR EXIT
+           NOMACH(1) PRINT COMMENT $PLEASE CONTINUE $
+           TRANSFER TO START
+           NOMACH(2) PRINT COMMENT $HMMM $
+           TRANSFER TO START
+           NOMACH(3) PRINT COMMENT $GO ON, PLEASE $
+           TRANSFER TO START
+           NOMACH(4) PRINT COMMENT $I SEE $
+           TRANSFER TO START
+           VECTOR VALUES SNUMB = $13 $
+           END OF PROGRAM
