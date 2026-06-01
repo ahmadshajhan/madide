@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAD IDE - The Ultimate Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-container">
@@ -18,7 +22,7 @@
             </div>
             <div class="nav-links">
                 <a href="#features">Features</a>
-                <a href="#documentation">Documentation</a>
+                <a href="docs.html">Documentation</a>
                 <a href="#download" class="btn-primary-small">Download</a>
             </div>
         </div>
@@ -29,10 +33,11 @@
             <div class="hero-text">
                 <div class="badge">Version 1.0 is here</div>
                 <h1>Code at the speed of thought.</h1>
-                <p>MAD IDE brings modern aesthetic and unparalleled productivity to the Michigan Algorithm Decoder (MAD) language. With built-in transpilation and native execution.</p>
+                <p>MAD IDE brings modern aesthetic and unparalleled productivity to the Michigan Algorithm Decoder (MAD)
+                    language. With built-in transpilation and native execution.</p>
                 <div class="hero-actions">
                     <a href="#download" class="btn-primary">Get MAD IDE</a>
-                    <a href="#documentation" class="btn-secondary">Read the Docs</a>
+                    <a href="docs.html" class="btn-secondary">Read the Docs</a>
                 </div>
             </div>
             <div class="hero-image">
@@ -49,42 +54,26 @@
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
                     <h3>Native Execution</h3>
-                    <p>Write MAD code and hit Run. The built-in pipeline transpiles to C and compiles natively to binary on Windows and Linux.</p>
+                    <p>Write MAD code and hit Run. The built-in pipeline transpiles to C and compiles natively to binary
+                        on Windows and Linux.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🌗</div>
                     <h3>Beautiful UI</h3>
-                    <p>Designed with a premium dark mode and light mode, featuring custom syntax highlighting and fluid animations.</p>
+                    <p>Designed with a premium dark mode and light mode, featuring custom syntax highlighting and fluid
+                        animations.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🛠️</div>
                     <h3>Smart Preprocessing</h3>
-                    <p>Built-in CTSS abbreviation expansion and automatic IBM 7090 line padding to make coding effortless.</p>
+                    <p>Built-in CTSS abbreviation expansion and automatic IBM 7090 line padding to make coding
+                        effortless.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">📂</div>
                     <h3>Integrated Explorer</h3>
-                    <p>Manage your workspaces directly. Create files, organize folders, and keep everything within reach.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="documentation" class="docs-section">
-        <div class="container">
-            <h2>Documentation & Usage</h2>
-            <div class="docs-content">
-                <div class="doc-block">
-                    <h3>Code Preprocessing</h3>
-                    <p>MAD IDE automatically handles <code>CTSS</code> abbreviations such as <code>W'R</code> for <code>WHENEVER</code>, expanding them before transpilation. Simply type your modern shorthand and the IDE will pad your labels to column 6, and format your statements from column 12 according to legacy IBM specifications.</p>
-                </div>
-                <div class="doc-block">
-                    <h3>Building The Compiler</h3>
-                    <p>To use the transpilation pipeline, you must have <code>make</code> and a C compiler (<code>gcc</code> or <code>clang</code>) installed. In the IDE, go to <code>Tools -> Build MAD Compiler</code> to initialize the backend.</p>
-                </div>
-                <div class="doc-block">
-                    <h3>Syntax Highlight</h3>
-                    <p>Built-in PyQsciScintilla lexer tailored specifically for MAD, featuring customizable keywords, strings, and comment stylings. Switch between light and dark modes easily via the top toolbar.</p>
+                    <p>Manage your workspaces directly. Create files, organize folders, and keep everything within
+                        reach.</p>
                 </div>
             </div>
         </div>
@@ -95,7 +84,7 @@
             <div class="download-card">
                 <h2>Install MAD IDE</h2>
                 <p>Choose your platform to get started.</p>
-                
+
                 <div class="os-tabs">
                     <div class="os-tab active" onclick="showTab('linux')">Linux</div>
                     <div class="os-tab" onclick="showTab('windows')">Windows</div>
@@ -136,10 +125,11 @@
         function showTab(os) {
             document.querySelectorAll('.os-tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.download-content').forEach(content => content.style.display = 'none');
-            
+
             event.target.classList.add('active');
             document.getElementById(os + '-download').style.display = 'block';
         }
     </script>
 </body>
+
 </html>
